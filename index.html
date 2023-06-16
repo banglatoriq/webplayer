@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video Player</title>
+  <style>
+    #video-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    video {
+      width: 640px;
+      height: 360px;
+    }
+    
+    .playlist-item {
+      cursor: pointer;
+      padding: 5px;
+    }
+    input#video-input {
+    margin-bottom: 10px;
+}
+  </style>
+</head>
+<body>
+  <div id="video-container">
+    
+    <video id="video-player" controls>
+      <source src="" type="video/mp4">
+    </video>
+    <input id="video-input" type="file" accept="video/mp4,video/x-m4v,video/*" multiple>
+    <div>
+      <button id="previous-btn">Previous</button>
+      <button id="next-btn">Next</button>
+    </div>
+    <div id="playlist">
+      <h3>Playlist</h3>
+    </div>
+  
+  </div>
+
+  <script>
+    const videoPlayer = document.getElementById('video-player');
+    const playbackSpeedSelect = document.getElementById('playback-speed');
+    const playlist = document.getElementById('playlist');
+    const videoInput = document.getElementById('video-input');
+    const previousButton = document.getElementById('previous-btn');
+    const nextButton = document.getElementById('next-btn');
+    let currentVideoIndex = 0;
+    let videos = [];
+
+    videoInput.addEventListener('change', (event) => {
+      const files = event.target.files;
+      videos = Array.from(files);
+      createPlaylist();
+    });
+
+    // Add event listener to each playlist item
+    playlist.addEventListener('click', (event) => {
+      if (event.target.classList.contains('playlist-item')) {
+        const index = parseInt(event.target.dataset.index);
+        playVideo(index);
+      }
+    });
+
+    // Event listener for playback speed change
+    playbackSpeedSelect.addEventListener('change', () => {
+      videoPlayer.playbackRate = parseFloat(playbackSpeedSelect.value);
+    });
+
+    // Event listener for previous button
+    previousButton.addEventListener('click', () => {
+      playPreviousVideo();
+    });
+
+    // Event listener for next button
+    nextButton.addEventListener('click', () => {
+      playNextVideo();
+    });
+
+    function createPlaylist() {
+      playlist.innerHTML = '<h3>Playlist</h3>';
+      videos.forEach((video, index) => {
+        const listItem = document.createElement('div');
+        listItem.classList.add('playlist-item');
+        listItem.textContent = video.name;
+        listItem.dataset.index = index;
+        playlist.appendChild(listItem);
+      });
+      playVideo(0);
+    }
+
+    function playVideo(index) {
+      currentVideoIndex = index;
+      const selectedVideo = videos[index];
+      const videoURL = URL.createObjectURL(selectedVideo);
+      videoPlayer.src = videoURL;
+      videoPlayer.load();
+      videoPlayer.play();
+    }
+
+    function playPreviousVideo() {
+      if (currentVideoIndex > 0) {
+        currentVideoIndex--;
+        playVideo(currentVideoIndex);
+      }
+    }
+
+    function playNextVideo() {
+      if (currentVideoIndex < videos.length - 1) {
+        currentVideoIndex++;
+        playVideo(currentVideoIndex);
+      }
+    }
+  </script>
+</body>
+</html>
